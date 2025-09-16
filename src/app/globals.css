@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* base app styles */
+:root {
+  --bg: #f8fafc;
+  --muted: #6b7280;
+}
+
+html, body, #__next {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* small helper */
+.container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
