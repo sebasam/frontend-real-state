@@ -12,9 +12,6 @@ export default function Header() {
           <a className="hover:text-slate-900" href="#">
             Propiedades
           </a>
-          <a className="hover:text-slate-900" href="#">
-            Contacto
-          </a>
         </nav>
       </div>
     </header>

@@ -6,17 +6,16 @@ import type { PropertyDto, PropertyFiltersDto } from '@/services/propertyService
 import { fetchProperties } from '@/services/propertyService'
 import PropertyFilters from '@/components/PropertyFilters/PropertyFilters'
 import PropertyCard from '@/components/PropertyCard/PropertyCard'
-import PropertyModal from '@/components/PropertyModal/PropertyModal'
+import PropertyDetails from '@/components/PropertyDetails/PropertyDetails'
 import Loader from '@/components/Loader'
 import toast from 'react-hot-toast'
 
 export default function HomePage() {
   const [filters, setFilters] = useState<PropertyFiltersDto>({})
-  const [selectedProperty, setSelectedProperty] = useState<PropertyDto | null>(null)
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(9) // puedes ajustar el tamaño por página
+  const [pageSize, setPageSize] = useState(10)
 
-  // Combinar filtros con paginación
   const queryParams = useMemo(
     () => ({ ...filters, page, pageSize }),
     [filters, page, pageSize]
@@ -27,8 +26,11 @@ export default function HomePage() {
     queryFn: () => fetchProperties(queryParams),
     staleTime: 30_000,
     placeholderData: [],
-    // onError: () => toast.error('Error cargando propiedades')
   })
+
+  const sortedData = useMemo(() => {
+    return [...data].sort((a, b) => a.price - b.price)
+  }, [data])
 
   const handlePrev = () => {
     if (page > 1) setPage((p) => p - 1)
@@ -37,6 +39,18 @@ export default function HomePage() {
   const handleNext = () => {
     if (data.length === pageSize) setPage((p) => p + 1)
   }
+
+  const handleFilter = (f: PropertyFiltersDto) => {
+    const hasFilter = Object.values(f).some((value) => value !== '' && value !== null && value !== undefined)
+    if (!hasFilter) {
+      toast('Por favor selecciona al menos un filtro', { icon: '⚠️' })
+      return
+    }
+
+    setFilters(f)
+    setPage(1)
+  }
+
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -49,10 +63,7 @@ export default function HomePage() {
         </header>
 
         <PropertyFilters
-          onFilter={(f) => {
-            setFilters(f)
-            setPage(1) // resetear a la página 1 al aplicar nuevos filtros
-          }}
+          onFilter={handleFilter}
           initial={filters}
         />
 
@@ -64,8 +75,12 @@ export default function HomePage() {
         )}
 
         <section className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-6">
-          {data.map((p) => (
-            <PropertyCard key={p.id} property={p} onClick={setSelectedProperty} />
+          {sortedData.map((p) => (
+            <PropertyCard
+              key={p.id}
+              property={p}
+              onClick={() => setSelectedPropertyId(p.id)}
+            />
           ))}
         </section>
 
@@ -75,7 +90,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Controles de paginación */}
         <div className="flex justify-center items-center gap-4 mt-8">
           <button
             onClick={handlePrev}
@@ -95,9 +109,9 @@ export default function HomePage() {
         </div>
       </main>
 
-      <PropertyModal
-        property={selectedProperty}
-        onClose={() => setSelectedProperty(null)}
+      <PropertyDetails
+        propertyId={selectedPropertyId}
+        onClose={() => setSelectedPropertyId(null)}
       />
     </div>
   )

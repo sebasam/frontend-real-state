@@ -18,10 +18,6 @@ export interface PropertyDto {
   price: number;
   imageUrl?: string;
 }
-
-/**
- * Construye query string a partir de los filtros definidos
- */
 function buildQuery(filters: PropertyFiltersDto = {}) {
   const params = new URLSearchParams();
 
@@ -59,4 +55,27 @@ export async function fetchProperties(
         imageUrl: p.imageUrl ?? (p.images && p.images[0]?.file) ?? undefined
       }))
     : [];
+}
+
+export async function fetchPropertyById(id: string): Promise<PropertyDto | null> {
+  const res = await fetch(`${API_URL}/property/${id}`);
+
+  if (res.status === 404) return null;
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Fetch property by Id failed: ${res.status} ${text}`);
+  }
+
+  const p = await res.json();
+
+  return {
+    id: p.id ?? p._id ?? '',
+    ownerId: p.ownerId ?? '',
+    ownerName: p.ownerName ?? '',
+    name: p.name ?? '',
+    address: p.address ?? '',
+    price: Number(p.price ?? 0),
+    imageUrl: p.imageUrl ?? (p.images && p.images[0]?.file) ?? undefined
+  };
 }

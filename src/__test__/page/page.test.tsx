@@ -1,4 +1,3 @@
-// src/__tests__/page/HomePage.test.tsx
 import { render, screen, fireEvent } from '@testing-library/react'
 import HomePage from '@/app/page'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -18,15 +17,16 @@ jest.mock('@/components/PropertyFilters/PropertyFilters', () => ({
 jest.mock('@/components/PropertyCard/PropertyCard', () => ({
   __esModule: true,
   default: ({ property, onClick }: any) => (
-    <div data-testid="card" onClick={() => onClick(property)}>
+    <div data-testid="card" onClick={() => onClick(property.id)}>
       {property.name}
     </div>
   ),
 }))
 
-jest.mock('@/components/PropertyModal/PropertyModal', () => ({
+jest.mock('@/components/PropertyDetails/PropertyDetails', () => ({
   __esModule: true,
-  default: ({ property }: any) => property ? <div data-testid="modal">{property.name}</div> : null
+  default: ({ propertyId, onClose }: any) =>
+    propertyId ? <div data-testid="modal">Casa Bonita</div> : null,
 }))
 
 jest.mock('@/components/Loader', () => ({ __esModule: true, default: () => <div>Loading...</div> }))
@@ -45,16 +45,13 @@ const renderWithQueryClient = (ui: React.ReactElement) => {
 describe('HomePage', () => {
   it('renderiza filtros y propiedades', async () => {
     renderWithQueryClient(<HomePage />)
-
     fireEvent.click(screen.getByText('Filtrar'))
-
     const card = await screen.findByTestId('card')
     expect(card).toHaveTextContent('Casa Bonita')
   })
 
   it('abre y cierra el modal al hacer click en una propiedad', async () => {
     renderWithQueryClient(<HomePage />)
-
     const card = await screen.findByTestId('card')
     fireEvent.click(card)
 

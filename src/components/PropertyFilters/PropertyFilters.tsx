@@ -14,7 +14,7 @@ export default function PropertyFilters({ initial, onFilter }: Props) {
     ...initial
   })
 
-  const handleChange = (field: keyof PropertyFiltersDto, value: any) => {
+  const handleChange = (field: keyof PropertyFiltersDto, value: string | number) => {
     setFilters((prev) => ({ ...prev, [field]: value }))
   }
 
