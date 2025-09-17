@@ -40,16 +40,15 @@ export default function HomePage() {
     if (data.length === pageSize) setPage((p) => p + 1)
   }
 
-  const handleFilter = (f: PropertyFiltersDto) => {
-    const hasFilter = Object.values(f).some((value) => value !== '' && value !== null && value !== undefined)
-    if (!hasFilter) {
-      toast('Por favor selecciona al menos un filtro', { icon: '⚠️' })
-      return
-    }
-
-    setFilters(f)
-    setPage(1)
+const handleFilter = (f: PropertyFiltersDto) => {
+  const hasFilter = Object.values(f).some(v => v !== '' && v !== null && v !== undefined)
+  if (!hasFilter) {
+    toast('Por favor selecciona al menos un filtro', { icon: '⚠️' })
+    return
   }
+  setFilters(f)
+  setPage(1)
+}
 
 
   return (
@@ -90,23 +89,25 @@ export default function HomePage() {
           </div>
         )}
 
-        <div className="flex justify-center items-center gap-4 mt-8">
-          <button
-            onClick={handlePrev}
-            disabled={page === 1}
-            className="px-4 py-2 bg-slate-200 rounded disabled:opacity-50"
-          >
-            ⬅️ Anterior
-          </button>
-          <span className="text-slate-600">Página {page}</span>
-          <button
-            onClick={handleNext}
-            disabled={data.length < pageSize}
-            className="px-4 py-2 bg-slate-200 rounded disabled:opacity-50"
-          >
-            Siguiente ➡️
-          </button>
-        </div>
+        {data.length > 0 && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <button
+              onClick={handlePrev}
+              disabled={page === 1}
+              className="px-4 py-2 bg-slate-200 rounded disabled:opacity-50"
+            >
+              ⬅️ Anterior
+            </button>
+            <span className="text-slate-600">Página {page}</span>
+            <button
+              onClick={handleNext}
+              disabled={data.length < pageSize}
+              className="px-4 py-2 bg-slate-200 rounded disabled:opacity-50"
+            >
+              Siguiente ➡️
+            </button>
+          </div>
+        )}
       </main>
 
       <PropertyDetails
