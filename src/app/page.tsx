@@ -4,22 +4,39 @@ import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { PropertyDto, PropertyFiltersDto } from '@/services/propertyService'
 import { fetchProperties } from '@/services/propertyService'
-import PropertyFilters from '@/components/PropertyFilters'
-import PropertyCard from '@/components/PropertyCard'
-import PropertyModal from '@/components/PropertyModal'
+import PropertyFilters from '@/components/PropertyFilters/PropertyFilters'
+import PropertyCard from '@/components/PropertyCard/PropertyCard'
+import PropertyModal from '@/components/PropertyModal/PropertyModal'
+import Loader from '@/components/Loader'
+import toast from 'react-hot-toast'
 
 export default function HomePage() {
   const [filters, setFilters] = useState<PropertyFiltersDto>({})
   const [selectedProperty, setSelectedProperty] = useState<PropertyDto | null>(null)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(9) // puedes ajustar el tamaño por página
 
-  const memoFilters = useMemo(() => filters, [filters])
+  // Combinar filtros con paginación
+  const queryParams = useMemo(
+    () => ({ ...filters, page, pageSize }),
+    [filters, page, pageSize]
+  )
 
   const { data = [], isLoading, isError } = useQuery<PropertyDto[]>({
-    queryKey: ['properties', memoFilters],
-    queryFn: () => fetchProperties(memoFilters),
+    queryKey: ['properties', queryParams],
+    queryFn: () => fetchProperties(queryParams),
     staleTime: 30_000,
-    placeholderData: []
+    placeholderData: [],
+    // onError: () => toast.error('Error cargando propiedades')
   })
+
+  const handlePrev = () => {
+    if (page > 1) setPage((p) => p - 1)
+  }
+
+  const handleNext = () => {
+    if (data.length === pageSize) setPage((p) => p + 1)
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -31,11 +48,15 @@ export default function HomePage() {
           </p>
         </header>
 
-        <PropertyFilters onFilter={setFilters} initial={filters} />
+        <PropertyFilters
+          onFilter={(f) => {
+            setFilters(f)
+            setPage(1) // resetear a la página 1 al aplicar nuevos filtros
+          }}
+          initial={filters}
+        />
 
-        {isLoading && (
-          <div className="text-center py-6 text-slate-500">Cargando propiedades...</div>
-        )}
+        {isLoading && <Loader />}
         {isError && (
           <div className="text-center py-6 text-red-600">
             Error cargando propiedades. Intenta de nuevo.
@@ -53,6 +74,25 @@ export default function HomePage() {
             No se encontraron propiedades con esos filtros
           </div>
         )}
+
+        {/* Controles de paginación */}
+        <div className="flex justify-center items-center gap-4 mt-8">
+          <button
+            onClick={handlePrev}
+            disabled={page === 1}
+            className="px-4 py-2 bg-slate-200 rounded disabled:opacity-50"
+          >
+            ⬅️ Anterior
+          </button>
+          <span className="text-slate-600">Página {page}</span>
+          <button
+            onClick={handleNext}
+            disabled={data.length < pageSize}
+            className="px-4 py-2 bg-slate-200 rounded disabled:opacity-50"
+          >
+            Siguiente ➡️
+          </button>
+        </div>
       </main>
 
       <PropertyModal
