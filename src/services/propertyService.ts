@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5187/api'
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface PropertyFiltersDto {
   name?: string
@@ -11,15 +11,16 @@ export interface PropertyFiltersDto {
 
 export interface PropertyDto {
   id: string
-  idOwner: string
+  ownerId: string
+  ownerName?: string
   name: string
   address: string
   price: number
-  image?: string
+  imageUrl?: string
 }
 
 /**
- * Build query string from filters (only defined fields)
+ * Construye query string a partir de los filtros definidos
  */
 function buildQuery(filters?: PropertyFiltersDto) {
   if (!filters) return ''
@@ -36,19 +37,20 @@ function buildQuery(filters?: PropertyFiltersDto) {
 
 export async function fetchProperties(filters?: PropertyFiltersDto): Promise<PropertyDto[]> {
   const q = buildQuery(filters)
-  const res = await fetch(`${API_URL}/properties${q}`)
+  const res = await fetch(`${API_URL}/property${q}`)
   if (!res.ok) {
     const text = await res.text()
     throw new Error(`Fetch properties failed: ${res.status} ${text}`)
   }
   const json = await res.json()
-  // ensure shape: map backend fields into frontend DTO if necessary
+
   return Array.isArray(json) ? json.map((p: any) => ({
-    id: p.idProperty ?? p.id ?? p._id ?? '',
-    idOwner: p.idOwner ?? p.ownerId ?? '',
+    id: p.id ?? p._id ?? '',
+    ownerId: p.ownerId ?? '',
+    ownerName: p.ownerName ?? '', // backend debe devolverlo si quieres nombre
     name: p.name ?? '',
     address: p.address ?? '',
     price: Number(p.price ?? 0),
-    image: p.image ?? p.file ?? (p.images && p.images[0]) ?? undefined
+    imageUrl: p.imageUrl ?? (p.images && p.images[0]?.file) ?? undefined
   })) : []
 }

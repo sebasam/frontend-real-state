@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -9,11 +9,14 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex gap-6 text-sm text-slate-600">
-          <a className="hover:text-slate-900" href="#">Propiedades</a>
-          <a className="hover:text-slate-900" href="#">Contacto</a>
+          <a className="hover:text-slate-900" href="#">
+            Propiedades
+          </a>
+          <a className="hover:text-slate-900" href="#">
+            Contacto
+          </a>
         </nav>
-
       </div>
     </header>
-  )
+  );
 }
