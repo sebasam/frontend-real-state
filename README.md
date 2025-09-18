@@ -11,9 +11,9 @@ Repositorio: [https://github.com/sebasam/frontend-real-state](https://github.com
 - Next.js
 - React
 - TypeScript
-- CSS Modules
-- Heroku (despliegue)
-- Fetch API
+- Tailwind
+- Jest
+- React Testing Library
 
 ---
 
@@ -42,4 +42,10 @@ npm install
 
 ```
 npm run dev
+```
+
+# 3. Test unitarios
+
+```
+npm test
 ```
