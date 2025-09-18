@@ -22,7 +22,7 @@ Repositorio: [https://github.com/sebasam/frontend-real-state](https://github.com
 Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido:
 
 ```env
-NEXT_PUBLIC_API_URL=https://localhost:7174/api
+NEXT_PUBLIC_API_URL=https://localhost:5187/api
 ```
 
 # 1. Clonar el repositorio
